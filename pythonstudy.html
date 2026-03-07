@@ -644,7 +644,7 @@ with open("alunos.txt", "r") as f:
                     <div class="code-container"><button class="copy-btn" onclick="copyText(this)">Copiar</button>
                     <pre><code class="language-python">import re
 
-texto = "Meu email é joao@email.com"
+texto = "Meu email é <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92f8fdf3fdd2f7fff3fbfebcf1fdff">[email&#160;protected]</a>"
 padrao = r"\w+@\w+\.\w+"
 
 resultado = re.search(padrao, texto)
@@ -804,7 +804,7 @@ print("Total:", calcular())</code></pre></div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 
     <script>
@@ -1003,24 +1003,41 @@ print("Total:", calcular())</code></pre></div>
         // Mark first section as visited on load
         markDone('hello');
 
+
         // === PWA INSTALL ===
-        let deferredPrompt;
+        let deferredPrompt = null;
+
+        // Hide install btn if already running as installed PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            document.getElementById('installBtn').style.display = 'none';
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('installBtn').style.display = 'flex';
         });
+
         document.getElementById('installBtn').addEventListener('click', async () => {
             if (!deferredPrompt) return;
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') document.getElementById('installBtn').style.display = 'none';
+            deferredPrompt = null;
+            if (outcome === 'accepted') {
+                document.getElementById('installBtn').style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installBtn').style.display = 'none';
             deferredPrompt = null;
         });
 
         // === SERVICE WORKER ===
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => reg.update())
+                .catch(() => {});
         }
     </script>
 </body>
